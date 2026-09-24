@@ -135,3 +135,9 @@ Hosted logs proved later mouse photos were saved but never analyzed: the shared 
 - **PASS:** the public source branch preserves the original GitHub repository history while removing the obsolete roof-tile Pages listing. Seller records, original photos and invited-account addresses are omitted from the source commit; local records remain available in the private checkout.
 - **PASS:** `SELLER_EMAILS` was set and checked as a backend-only setting on the existing hosted Convex trial before publishing env-driven allowlist code. The env-driven backend and Worker were deployed to the existing preview; Worker version `165e2ffb-ed8c-4d69-8a57-23d67e098c49`.
 - **PASS:** 67 unit/backend tests, frontend/backend types, production build and seven local browser scenarios passed with a bundled test image. Both hosted HTTPS/PWA checks passed after deployment. Actual Google sign-in by each invited account remains NOT RUN. Static publishing now requires an explicit `PUBLIC_BASE_URL`; the former Pages URL is not used as a default.
+
+## Public checkout and invited sign-in verification — 2026-09-24
+
+- **PASS:** `joealmond/second-hand` is public `main` at the source commit, the obsolete GitHub Pages site is disabled, and no seller records, original photos or local dependency links are in the public tree. The local checkout tracks that public branch; 51 private ad files were checked byte-for-byte after restoration and remain ignored.
+- **PASS:** the hosted backend's private `SELLER_EMAILS` matches the two existing invited accounts; Google client ID, secret and site URL are configured. The live sign-in button reached Google's OAuth handoff.
+- **NOT RUN:** completing Google sign-in as each person requires their own account interaction.
