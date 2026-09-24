@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "Tovább — használt tárgyak",
+  "short_name": "Tovább",
+  "description": "Fotózd le a tárgyat, mi segítünk kész hirdetést írni belőle.",
+  "lang": "hu",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F2F8F7",
+  "theme_color": "#F2F8F7",
+  "icons": [
+    {
+      "src": "/icons/tovabb-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/tovabb-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

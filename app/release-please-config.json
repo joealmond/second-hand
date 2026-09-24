@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "convexkit",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": false
+    },
+    "packages/create-convexkit": {
+      "release-type": "node",
+      "package-name": "create-convexkit",
+      "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": true
+    }
+  }
+}

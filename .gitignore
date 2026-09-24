@@ -1,0 +1,21 @@
+# Generated build artifacts — rebuild with scripts/build.py
+ads/*/index.html
+ads/*/export/
+site/
+
+.DS_Store
+__pycache__/
+*.pyc
+
+# Local prototype data, browser sessions and verification artifacts
+app/.convex/
+output/
+.playwright-cli/
+
+# Private working material, not source
+/conversation-export-*.md
+/inbox/*/
+
+# Seller records and original photos stay local
+/ads/*/
+/inbox/*/

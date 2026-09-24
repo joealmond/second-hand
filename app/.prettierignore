@@ -1,0 +1,13 @@
+node_modules
+dist
+.output
+.netlify
+.vercel
+.nitro
+.tanstack
+convex/_generated
+src/routeTree.gen.ts
+worker-configuration.d.ts
+infrastructure/.terraform
+*.tfstate*
+AGENTS.md

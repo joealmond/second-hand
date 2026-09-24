@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "install": false,
+  "terraform": false,
+  "yes": true,
+  "templateRef": "create-convexkit-v1.0.0",
+  "auth": "better-auth",
+  "deploy": "cloudflare",
+  "examples": "files",
+  "project": "app",
+  "selectedExamples": [
+    "files"
+  ]
+}

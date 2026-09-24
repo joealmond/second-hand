@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tovabb-prototype",
+  "compatibility_date": "2026-09-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./src/server.ts",
+  "assets": {
+    "directory": "./dist/client",
+  },
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": true },
+    "traces": { "enabled": true, "head_sampling_rate": 0.1 },
+  },
+  "env": {
+    "preview": {
+      "name": "tovabb-prototype-preview",
+      "vars": {
+        "APP_ENV": "preview",
+      },
+      "observability": {
+        "enabled": true,
+        "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": true },
+        "traces": { "enabled": true, "head_sampling_rate": 0.1 },
+      },
+    },
+    "production": {
+      "name": "tovabb-prototype-production",
+      "vars": {
+        "APP_ENV": "production",
+      },
+      "observability": {
+        "enabled": true,
+        "logs": { "enabled": true, "head_sampling_rate": 0.1, "invocation_logs": true },
+        "traces": { "enabled": true, "head_sampling_rate": 0.01 },
+      },
+    },
+  },
+}

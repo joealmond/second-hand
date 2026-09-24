@@ -1,0 +1,55 @@
+# Dependencies
+node_modules
+.pnpm-store/
+
+# Build outputs
+dist/
+.output/
+.netlify/
+.vercel/
+.nitro/
+.tanstack/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# Convex's generated API types are committed so a fresh checkout can typecheck
+# and build before it is connected to a deployment.
+
+# Environment files (keep .env.example)
+.env
+.env.local
+.env.*.local
+.dev.vars
+.dev.vars.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Terraform
+infrastructure/.terraform/
+infrastructure/*.tfstate
+infrastructure/*.tfstate.*
+# Commit the Terraform dependency lock file for reproducible provider installs.
+infrastructure/*.tfvars
+!infrastructure/terraform.tfvars.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+playwright-report/
+output/playwright/
+
+# Wrangler
+.wrangler/
+.wrangler.deploy.jsonc
+.convex/
+test-results/
+
+# TanStack Router's generated route tree is committed for fresh-checkout builds.

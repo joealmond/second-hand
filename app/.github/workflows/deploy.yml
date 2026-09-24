@@ -1,0 +1,113 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: true
+        default: preview
+        type: choice
+        options: [preview, production]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'preview' }}
+  cancel-in-progress: false
+
+env:
+  ENVIRONMENT: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'preview' }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  CONVEX_HOSTING: ${{ vars.CONVEX_HOSTING || 'cloud' }}
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'preview' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || 'preview' }}
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (vars.AUTO_DEPLOY_ENABLED == 'true' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main')
+    steps:
+      - name: Checkout validated commit
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Deploy Convex cloud production
+        if: env.CONVEX_HOSTING == 'cloud' && env.ENVIRONMENT == 'production'
+        run: npx convex deploy --yes
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY_PROD }}
+
+      - name: Deploy Convex cloud preview
+        if: env.CONVEX_HOSTING == 'cloud' && env.ENVIRONMENT == 'preview'
+        run: npx convex dev --once --typecheck=disable
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY_PREVIEW }}
+
+      - name: Deploy Convex self-hosted production
+        if: env.CONVEX_HOSTING == 'self-hosted' && env.ENVIRONMENT == 'production'
+        run: npx convex deploy --yes --url "${{ secrets.CONVEX_URL_PROD }}"
+        env:
+          CONVEX_ADMIN_KEY: ${{ secrets.CONVEX_ADMIN_KEY_PROD }}
+
+      - name: Deploy Convex self-hosted preview
+        if: env.CONVEX_HOSTING == 'self-hosted' && env.ENVIRONMENT == 'preview'
+        run: npx convex dev --once --typecheck=disable --url "${{ secrets.CONVEX_URL_PREVIEW }}"
+        env:
+          CONVEX_ADMIN_KEY: ${{ secrets.CONVEX_ADMIN_KEY_PREVIEW }}
+
+      - name: Build production Worker
+        if: env.ENVIRONMENT == 'production'
+        run: npm run build:prod
+        env:
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL_PROD }}
+          VITE_CONVEX_SITE_URL: ${{ secrets.VITE_CONVEX_SITE_URL_PROD }}
+          VITE_APP_ENV: production
+
+      - name: Build preview Worker
+        if: env.ENVIRONMENT == 'preview'
+        run: npm run build:preview
+        env:
+          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL_PREVIEW }}
+          VITE_CONVEX_SITE_URL: ${{ secrets.VITE_CONVEX_SITE_URL_PREVIEW }}
+          VITE_APP_ENV: preview
+
+      - name: Generate Wrangler deploy config
+        run: npm run sync:wrangler-config
+        env:
+          CLOUDFLARE_CUSTOM_DOMAIN: ${{ env.ENVIRONMENT == 'production' && vars.CLOUDFLARE_CUSTOM_DOMAIN_PROD || vars.CLOUDFLARE_CUSTOM_DOMAIN_PREVIEW }}
+
+      - name: Deploy Cloudflare Worker
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config dist/server/wrangler.json
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment complete" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Environment: ${{ env.ENVIRONMENT }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Convex hosting: ${{ env.CONVEX_HOSTING }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}" >> "$GITHUB_STEP_SUMMARY"
